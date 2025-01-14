@@ -72,3 +72,45 @@ Vale ressaltar que essa avaliação deve ser realizada no momento em que o clien
 - E em **Target Default** podemos ver que há mais registros **positivos** com relação aos créditos.
 
 - Verificamos que  há valores discrepantes nas variáveis **credit_limit**, **income** e **reporte_income**, mas precisamos ter cuidado ao excluir pois podemos compromoter a qualidade dos dados.
+
+# Relatório Análise Bivariada
+
+Sobre as correlações feitas com Diagramas de Dispersão, Correlação de Pearson, e verificação de Multicolinearidade e utilização do VIF(Variance Inflation Factor):
+
+- Não foi detectado correlações significativas entre as variáveis utilizando as técnicas mencionadas. 
+
+- As Correlações de Pearson ficaram abaixo de 0.50, apenas duas variáveis tiveram um valor de 0.88. 
+
+- No teste do VIF, os valores de cada variável ficaram abaixo de 5.0, que é o aceitável para a inexistência de multicolinearidade, e correlação. 
+
+Perguntas de Negócio
+
+Foram criadas perguntas de negócio iniciais para o Score 3 > 700, que significa um baixo risco de inadimplência. 
+
+Com isso detectamos as seguintes informações:
+
+- Há clientes com Score 3 > 700 que possuem Risk Rate de 0.52, significando um certo risco de inadimplência.
+
+- Há clientes com Score 3 > 700 que fizeram últimos empréstimos maiores que 20.000.
+
+- Há clientes com Score 3 > 700 com limite de crédito maior que 50.000.
+
+- Há clientes com Score 3 > 700 com Renda entre 10.000 a 30.000.
+
+- Há clientes com Score 3 > 700 com OK Since entre 5 meses a 10 meses. Isso significa que há possível inadimplência.
+
+- Há clientes com Score 3 > 700 com registros de falência.
+
+- Há clientes com Score 3 > 700 que possuem mais de 1 conta.
+
+- Há clientes com Score 3 > 700 que possuem problemas (n_issues) maiores do que 1.
+
+- Há clientes com Score 3 > 700 que possuem o "número de vezes que um provedor de dados externo realizou uma verificação de crédito sobre uma pessoa no último mês."("external_data_provider_credit_checks_last_month") maiores do que 1. Isso significa que houve checagem na verificação de crédito.
+
+- Há clientes com Score 3 > 700 que possuem "número de vezes que um provedor de dados externo realizou uma verificação de crédito sobre uma pessoa no último ano."("external_data_provider_credit_checks_last_year") igual a 1. Isso também significa que houve checagem na verificação de crédito.
+
+- Há clientes com Score 3 > 700 que possuem Renda Reportada maior que 100.000.
+
+- Há clientes com Score 3 > 700 que estão em outros estados além de SP.
+
+- Há clientes com Score 3 > 700 que posseum inadimplência (target_default = 1).
