@@ -113,4 +113,4 @@ Com isso detectamos as seguintes informações:
 
 - Há clientes com Score 3 > 700 que estão em outros estados além de SP.
 
-- Há clientes com Score 3 > 700 que posseum inadimplência (target_default = 1).
+- Há clientes com Score 3 > 700 que possuem inadimplência (target_default = 1).
