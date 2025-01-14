@@ -83,7 +83,7 @@ Sobre as correlações feitas com Diagramas de Dispersão, Correlação de Pears
 
 - No teste do VIF, os valores de cada variável ficaram abaixo de 5.0, que é o aceitável para a inexistência de multicolinearidade, e correlação. 
 
-Perguntas de Negócio
+**Perguntas de Negócio**
 
 Foram criadas perguntas de negócio iniciais para o Score 3 > 700, que significa um baixo risco de inadimplência. 
 
