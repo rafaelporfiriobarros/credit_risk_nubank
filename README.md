@@ -141,6 +141,8 @@ Curva ROC: construção da curva e cálculo da Área Sob a Curva (AUC) e do Coef
 - AUC: 0.596
 - Coeficiente de Gini: 0.192
 
+![cartao_nubank](images/output_curva_roc.png)
+
 - Pipeline de Machine Learning
 
 Implementação de um pipeline para padronização dos dados usando StandardScaler.
