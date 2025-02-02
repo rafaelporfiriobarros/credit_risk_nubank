@@ -81,6 +81,8 @@ Sobre as correlações feitas com **Diagramas de Dispersão**, **Correlação de
 
 - As Correlações de Pearson ficaram abaixo de **0.50**, apenas duas variáveis tiveram um valor de **0.84**. 
 
+![cartao_nubank](images/output_correlations_2.png)
+
 - No teste do VIF, os valores de quase todas as variáveis ficaram abaixo de **5.0**, que é o aceitável para a inexistência de multicolinearidade, e correlação, apenas a variável last_borrowed_in_months ficou com valor de 1,222.99, provavelmente é um erro.
 
 
