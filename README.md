@@ -75,6 +75,8 @@ Vale ressaltar que essa avaliação deve ser realizada no momento em que o clien
 
 Sobre as correlações feitas com **Diagramas de Dispersão**, **Correlação de Pearson**, e verificação de **Multicolinearidade** e utilização do **VIF(Variance Inflation Factor)**:
 
+![cartao_nubank](images/output_correlations.png)
+
 - Não foi detectado correlações significativas entre as variáveis utilizando as técnicas mencionadas. 
 
 - As Correlações de Pearson ficaram abaixo de **0.50**, apenas duas variáveis tiveram um valor de **0.84**. 
