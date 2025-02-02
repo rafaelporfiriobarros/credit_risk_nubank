@@ -113,3 +113,38 @@ Com isso detectamos as seguintes informações:
 - Há clientes com **Médios - Score 3 de 301 até 700** que estão em outros estados além de **SP**.
 
 - Há clientes com **Médios - Score 3 de 301 até 700** que posseum inadimplência **(target_default = 1)**.
+
+# Relatório Inicial Modelagem
+
+- Dados e Pré-processamento
+
+Importação e análise prévia do dataset com informações como histórico de crédito, renda, score de crédito, entre outros.
+
+Tratamento de dados: exclusão de variáveis irrelevantes, tratamento de valores ausentes e outliers, e transformação de variáveis categóricas em numéricas usando One-Hot Encoding.
+
+Divisão dos dados em conjuntos de treino e teste para evitar vazamento de dados (data leakage).
+
+- Modelagem
+
+Utilização de Regressão Logística Binária para modelar a probabilidade de inadimplência.
+
+Aplicação do método Stepwise para seleção de variáveis, mantendo apenas as mais relevantes.
+
+Criação de uma nova variável, 'phat', que armazena as probabilidades previstas pelo modelo.
+
+- Avaliação do Modelo
+
+Matriz de confusão: análise com ponto de corte (cutoff) de 20% e cálculo de métricas como sensibilidade, especificidade e acurácia.
+
+Curva ROC: construção da curva e cálculo da Área Sob a Curva (AUC) e do Coeficiente de Gini.
+
+- AUC: 0.596
+- Coeficiente de Gini: 0.192
+
+- Pipeline de Machine Learning
+
+Implementação de um pipeline para padronização dos dados usando StandardScaler.
+
+Comparação inicial de modelos com Regressão Logística e XGBoost, com avaliação de desempenho via validação cruzada.
+
+Esse resultado baixo da curva ROC demonstra principalmente que precisamos de mais variáveis, a qualidade dos dados e a escolha das variáveis têm um impacto enorme no desempenho do modelo. 
