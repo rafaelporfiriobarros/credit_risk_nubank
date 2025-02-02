@@ -122,6 +122,8 @@ Importação e análise prévia do dataset com informações como histórico de 
 
 Tratamento de dados: exclusão de variáveis irrelevantes, tratamento de valores ausentes e outliers, e transformação de variáveis categóricas em numéricas usando One-Hot Encoding.
 
+![cartao_nubank](images/output_train_no_outliers.png)
+
 Divisão dos dados em conjuntos de treino e teste para evitar vazamento de dados (data leakage).
 
 - Modelagem
