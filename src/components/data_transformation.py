@@ -36,6 +36,8 @@ class DataTransformation:
                                     "external_data_provider_credit_checks_last_2_year",
                                     "external_data_provider_credit_checks_last_month",
                                     "external_data_provider_credit_checks_last_year", "reported_income"]
+            
+            categorical_columns = ["score"]
         
 
             numerical_pipeline = Pipeline(
@@ -45,12 +47,22 @@ class DataTransformation:
                 ]
             )
 
+            categorical_pipeline = Pipeline(
+                steps = [
+                    ("imputer", SimpleImputer(strategy="most_frequent")),
+                    ("one_hot_encoder", OneHotEncoder()),
+                    ("scaler", StandardScaler(with_mean=False))
+                ]
+            )
+
         
-            logging.info(f"Numerical Columns: {numerical_features}")
+            logging.info(f"Colunas Numericas: {numerical_features}")
+            logging.info(f"Colunas Categoricas: {categorical_columns}")
 
             preprocessor = ColumnTransformer(
                 [
-                    ("numerical_pipeline", numerical_pipeline, numerical_features)
+                    ("numerical_pipeline", numerical_pipeline, numerical_features),
+                    ("categorical_pipeline",categorical_pipeline,categorical_columns)
                 ]
             )
 
@@ -77,7 +89,7 @@ class DataTransformation:
             to_drop_feature = ["ids", "score_1", "score_2", "reason", "facebook_profile", "state", "zip", "channel", "job_name", "real_state",
             "email", "external_data_provider_first_name", "external_data_provider_email_seen_before","lat_lon", "marketing_channel",
             "application_time_applied", "profile_phone_number", "application_time_in_funnel","shipping_zip_code", "external_data_provider_fraud_score",
-            "profile_tags", "user_agent", "target_fraud"]
+            "profile_tags", "user_agent", "shipping_state","target_fraud"]
 
             train['credit_limit'] = train['credit_limit'].apply(lambda x: np.nan if x == 0 else x)
             test['credit_limit'] = test['credit_limit'].apply(lambda x: np.nan if x == 0 else x)
