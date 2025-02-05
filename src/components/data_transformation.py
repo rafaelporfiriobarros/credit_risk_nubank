@@ -128,7 +128,7 @@ class DataTransformation:
             train = categorize_score(train)
             test = categorize_score(test)
 
-                
+            ################################################################################################
 
             # função para separar os dados de treino em features (x) e target (y)
             def prepare_data(train, test, target_feature="target_default", to_drop_feature=None):
