@@ -55,7 +55,6 @@ class DataTransformation:
                 ]
             )
 
-        
             logging.info(f"Colunas Numericas: {numerical_features}")
             logging.info(f"Colunas Categoricas: {categorical_columns}")
 
@@ -82,39 +81,77 @@ class DataTransformation:
 
             preprocessor = self.get_preprocessor()
 
-            train["target_default"] = train["target_default"].map({"False":0, "True":1})
-            test["target_default"] = test["target_default"].map({"False":0, "True":1})
+            ################################ Funções ################################
 
-            target_feature = "target_default"
-            to_drop_feature = ["ids", "score_1", "score_2", "reason", "facebook_profile", "state", "zip", "channel", "job_name", "real_state",
-            "email", "external_data_provider_first_name", "external_data_provider_email_seen_before","lat_lon", "marketing_channel",
-            "application_time_applied", "profile_phone_number", "application_time_in_funnel","shipping_zip_code", "external_data_provider_fraud_score",
-            "profile_tags", "user_agent", "shipping_state","target_fraud"]
-
-            train['credit_limit'] = train['credit_limit'].apply(lambda x: np.nan if x == 0 else x)
-            test['credit_limit'] = test['credit_limit'].apply(lambda x: np.nan if x == 0 else x)
-
-            train.replace([np.inf, -np.inf], np.nan, inplace=True)
-            test.replace([np.inf, -np.inf], np.nan, inplace=True)
+            # função para converter valores boolean para int
+            def convert_boolean_to_int(df, column_name):
+                if column_name in df.columns:
+                    df[column_name] = df[column_name].fillna(False).astype(int)
+                else:
+                    raise ValueError(f"A coluna '{column_name}' não existe no Dataframe.")
+                return df
             
-            # Criação da coluna score para dividir o score_3 em niveis baixo, medio e alto
-            train["score"] = ""
+            train = convert_boolean_to_int(train, "target_default")
+            test = convert_boolean_to_int(test, "target_default")
 
-            train.loc[train["score_3"] <= 300 , "score"] = "baixo"
-            train.loc[(train["score_3"] >= 301) & (train["score_3"] <= 700), "score"] = "medio"
-            train.loc[train["score_3"] >= 701, "score"] = "alto"
+            ################################################################################################
 
-            test["score"] = ""
-
-            test.loc[test["score_3"] <= 300 , "score"] = "baixo"
-            test.loc[(test["score_3"] >= 301) & (test["score_3"] <= 700), "score"] = "medio"
-            test.loc[test["score_3"] >= 701, "score"] = "alto"
+            # função para substituir valores com 0 para nan
+            def replace_zero_with_nan(df, column_name):
+                df[column_name] = df[column_name].apply(lambda x: np.nan if x == 0 else x)
+                return df
             
-            X_train = train.drop(columns=[target_feature] + to_drop_feature, axis=1)
-            y_train = train[target_feature].copy()
+            train = replace_zero_with_nan(train, "credit_limit")
+            test = replace_zero_with_nan(test, "credit_limit")
+
+            ################################################################################################
+
+            # função para substituir valores inf e -inf para nan
+            def replace_inf_with_nan(df):
+                df.replace([np.inf, -np.inf], np.nan, inplace=True)
+                return df
             
-            X_test = test.drop(columns=[target_feature] + to_drop_feature, axis=1)
-            y_test = test[target_feature].copy()
+            train = replace_inf_with_nan(train)
+            test = replace_inf_with_nan(test)
+
+            ################################################################################################
+
+            # função para categorizar o score_3
+            def categorize_score(df, column="score_3"):
+                df["score"] = ""
+                df.loc[df[column] <= 300, "score"] = "baixo"
+                df.loc[(df[column] >= 301) & (df[column] <= 700), "score"] = "medio"
+                df.loc[df[column] >= 701, "score"] = "alto"
+                
+                return df
+            
+            train = categorize_score(train)
+            test = categorize_score(test)
+
+                
+
+            # função para separar os dados de treino em features (x) e target (y)
+            def prepare_data(train, test, target_feature="target_default", to_drop_feature=None):
+                if to_drop_feature is None:
+                    to_drop_feature = ["ids", "score_1", "score_2", "reason", "facebook_profile", "state", "zip", "channel", "job_name", "real_state",
+                                    "email", "external_data_provider_first_name", "external_data_provider_email_seen_before","lat_lon", "marketing_channel",
+                                    "application_time_applied", "profile_phone_number", "application_time_in_funnel","shipping_zip_code", "external_data_provider_fraud_score",
+                                    "profile_tags", "user_agent", "shipping_state","target_fraud"]
+
+                # Preparar dados de treino
+                X_train = train.drop(columns=[target_feature] + to_drop_feature, axis=1)
+                y_train = train[target_feature].copy()
+
+                # Preparar dados de teste
+                X_test = test.drop(columns=[target_feature] + to_drop_feature, axis=1)
+                y_test = test[target_feature].copy()
+
+                return X_train, y_train, X_test, y_test
+
+
+            X_train, y_train, X_test, y_test = prepare_data(train, test)
+
+            ################################################################################################
 
             logging.info("Binarizando Target, removendo Target e recursos irrelevantes dos conjuntos de treinamento e teste. X_train, X_test, y_train, y_test prontos para pre-processamento.")
             logging.info("Pre-processamento de conjuntos de treinamento e teste.")
