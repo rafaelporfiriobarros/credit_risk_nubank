@@ -25,11 +25,11 @@ class DataIngestion:
         self.ingestion_config = DataIngestionConfig()
 
     def apply_data_ingestion(self):
-        logging.info("Data ingestion started.")
+        logging.info("Ingestao dos Dados iniciada.")
 
         try:
             df = pd.read_csv("notebooks/data/acquisition_train.csv")
-            logging.info("Read the dataset as a Pandas Dataframe.")
+            logging.info("Leitura do dataset como um Dataframe do Pandas.")
 
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
 
@@ -38,7 +38,7 @@ class DataIngestion:
             X = df.drop(columns=["target_default"])
             y = df["target_default"].copy()
 
-            logging.info("Train test split started.")
+            logging.info("Train test split iniciado.")
             X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=42)
 
             train = pd.concat([X_train, y_train], axis=1)
@@ -47,7 +47,7 @@ class DataIngestion:
             train.to_csv(self.ingestion_config.train_data_path, index=False, header=True)
             test.to_csv(self.ingestion_config.test_dat_path, index=False, header=True)
 
-            logging.info("Finished data ingestion.")
+            logging.info("Ingestao dos dados finalizada.")
 
             return self.ingestion_config.train_data_path, self.ingestion_config.test_dat_path
         

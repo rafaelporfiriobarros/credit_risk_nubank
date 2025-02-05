@@ -36,8 +36,7 @@ class DataTransformation:
                                     "external_data_provider_credit_checks_last_2_year",
                                     "external_data_provider_credit_checks_last_month",
                                     "external_data_provider_credit_checks_last_year", "reported_income"]
-            
-            # categorical_features = ["score_3"]
+        
 
             numerical_pipeline = Pipeline(
                 steps = [
@@ -46,21 +45,12 @@ class DataTransformation:
                 ]
             )
 
-            # categorical_pipeline = Pipeline(
-            #     steps = [
-            #         ("imputer", SimpleImputer(strategy="most_frequent")),
-            #         ("one_hot_encoder", OneHotEncoder()),
-            #         ("scaler", StandardScaler(with_mean=False))
-            #     ]
-            # )
         
             logging.info(f"Numerical Columns: {numerical_features}")
-            # logging.info(f"Categorical Columns: {categorical_features}")
 
             preprocessor = ColumnTransformer(
                 [
-                    ("numerical_pipeline", numerical_pipeline, numerical_features),
-                    # ("categorical_pipeline", categorical_pipeline, categorical_features)
+                    ("numerical_pipeline", numerical_pipeline, numerical_features)
                 ]
             )
 
@@ -75,8 +65,8 @@ class DataTransformation:
             train = pd.read_csv(train_path)
             test = pd.read_csv(test_path)
 
-            logging.info("Read train and test sets.")
-            logging.info("Obtaining preprocessor object.")
+            logging.info("Ler conjuntos de treinamento e teste.")
+            logging.info("Obtendo objeto do pre-processador.")
 
             preprocessor = self.get_preprocessor()
 
@@ -95,33 +85,27 @@ class DataTransformation:
             train.replace([np.inf, -np.inf], np.nan, inplace=True)
             test.replace([np.inf, -np.inf], np.nan, inplace=True)
             
-            train["score_baixo"] = ""
-            train["score_medio"] = ""
-            train["score_alto"] = ""
+            # Criação da coluna score para dividir o score_3 em niveis baixo, medio e alto
+            train["score"] = ""
 
-            test["score_baixo"] = ""
-            test["score_medio"] = ""
-            test["score_alto"] = ""
+            train.loc[train["score_3"] <= 300 , "score"] = "baixo"
+            train.loc[(train["score_3"] >= 301) & (train["score_3"] <= 700), "score"] = "medio"
+            train.loc[train["score_3"] >= 701, "score"] = "alto"
 
+            test["score"] = ""
 
-            train.loc[train["score_3"] <= 300 , "baixo"] = "baixo"
-            test.loc[test["score_3"] <= 300, "baixo"] = "baixo"
-
-            train.loc[(train["score_3"] >= 301) & (train["score_3"] <= 700), "medio"] = "medio"
-            test.loc[(test["score_3"] >= 301) & (test["score_3"] <= 700), "medio"] = "medio"
-
-            train.loc[train["score_3"] >= 701, "alto"] = "alto"
-            test.loc[test["score_3"] >= 701, "alto"] = "alto"
+            test.loc[test["score_3"] <= 300 , "score"] = "baixo"
+            test.loc[(test["score_3"] >= 301) & (test["score_3"] <= 700), "score"] = "medio"
+            test.loc[test["score_3"] >= 701, "score"] = "alto"
             
-            # X_train = train.drop(columns = [target_feature, to_drop_feature])
             X_train = train.drop(columns=[target_feature] + to_drop_feature, axis=1)
             y_train = train[target_feature].copy()
             
             X_test = test.drop(columns=[target_feature] + to_drop_feature, axis=1)
             y_test = test[target_feature].copy()
 
-            logging.info("Binarizing Target, dropping Target and irrelevant features from train and test sets. X_train, X_test, y_train, y_test ready for preprocessing.")
-            logging.info("Preprocessing train and test sets.")
+            logging.info("Binarizando Target, removendo Target e recursos irrelevantes dos conjuntos de treinamento e teste. X_train, X_test, y_train, y_test prontos para pre-processamento.")
+            logging.info("Pre-processamento de conjuntos de treinamento e teste.")
 
             X_train_prepared = preprocessor.fit_transform(X_train, y_train)
             X_test_prepared = preprocessor.transform(X_test)
@@ -134,15 +118,15 @@ class DataTransformation:
                 X_test_prepared, np.array(y_test)
             ]
 
-            logging.info("Entire train and test sets prepared.")
-            logging.info("Save preprocessing object.")
+            logging.info("Conjuntos completos de trem e teste preparados.")
+            logging.info("Salvar objeto de pre-processamento.")
 
             save_object(
                 file_path=self.data_transformation_config.preprocessor_file_path,
                 obj=preprocessor  # Alterado 'object' para 'obj'
             )
 
-            logging.info("Data ingestion completed.")
+            logging.info("Ingestao dos Dados completada.")
 
             return train_prepared, test_prepared, self.data_transformation_config.preprocessor_file_path
 
