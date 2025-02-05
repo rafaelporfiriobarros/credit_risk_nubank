@@ -1,50 +1,62 @@
-import os
 import sys
 from exception import CustomException
 from logger import logging
-import pandas as pd
 
+import os
+
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
+from components.data_transformation import DataTransformationConfig
+from components.data_transformation import DataTransformation
+
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 @dataclass
 class DataIngestionConfig:
-    train_data_path: str=os.path.join('artifacts',"train.csv")
-    test_data_path: str=os.path.join('artifacts',"test.csv")
-    raw_data_path: str=os.path.join('artifacts',"data.csv")
+    train_data_path = os.path.join("artifacts", "train.csv")
+    test_dat_path = os.path.join("artifacts", "test.csv")
+    raw_data_path = os.path.join("artifacts", "data.csv")
 
 class DataIngestion:
-    def __init__(self):
-        self.ingestion_config=DataIngestionConfig()
+    def __init__(self) -> None:
+        self.ingestion_config = DataIngestionConfig()
 
-    def initiate_data_ingestion(self):
-        logging.info("Entered the data ingestion method or component")
+    def apply_data_ingestion(self):
+        logging.info("Data ingestion started.")
+
         try:
-            df=pd.read_csv('notebooks/data/acquisition_train.csv')
-            logging.info('Read the dataset as dataframe')
+            df = pd.read_csv("notebooks/data/acquisition_train.csv")
+            logging.info("Read the dataset as a Pandas Dataframe.")
 
-            os.makedirs(os.path.dirname(self.ingestion_config.train_data_path),exist_ok=True)
+            os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
 
-            df.to_csv(self.ingestion_config.raw_data_path,index=False,header=True)
+            df.to_csv(self.ingestion_config.raw_data_path, index = False, header = True)
 
-            logging.info("Train test split initiated")
-            train_set,test_set=train_test_split(df,test_size=0.2,random_state=42)
+            X = df.drop(columns=["target_default"])
+            y = df["target_default"].copy()
 
-            train_set.to_csv(self.ingestion_config.train_data_path,index=False,header=True)
+            logging.info("Train test split started.")
+            X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=42)
 
-            test_set.to_csv(self.ingestion_config.test_data_path,index=False,header=True)
+            train = pd.concat([X_train, y_train], axis=1)
+            test = pd.concat([X_test, y_test], axis = 1)
 
-            logging.info("Ingestion of the data is completed")
+            train.to_csv(self.ingestion_config.train_data_path, index=False, header=True)
+            test.to_csv(self.ingestion_config.test_dat_path, index=False, header=True)
 
-            return(
-                self.ingestion_config.train_data_path,
-                self.ingestion_config.test_data_path
+            logging.info("Finished data ingestion.")
 
-            )
+            return self.ingestion_config.train_data_path, self.ingestion_config.test_dat_path
+        
         except Exception as e:
-            raise CustomException(e,sys)
+            raise CustomException(e, sys)
         
 if __name__=="__main__":
     obj=DataIngestion()
-    train_data,test_data=obj.initiate_data_ingestion()
+    train_data,test_data=obj.apply_data_ingestion()
+
+    data_transformation=DataTransformation()
+    train_prepared,test_prepared,_=data_transformation.apply_data_transformation(train_data,test_data)
