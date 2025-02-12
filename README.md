@@ -149,13 +149,11 @@ Curva ROC: construção da curva e cálculo da Área Sob a Curva (AUC) e do Coef
 
 ![cartao_nubank](images/output_curva_roc.png)
 
+Esse resultado baixo da curva ROC demonstra principalmente que precisamos de mais variáveis, a qualidade dos dados e a escolha das variáveis têm um impacto enorme no desempenho do modelo. 
+
 - Pipeline de Machine Learning
 
 Implementação de um pipeline para padronização dos dados usando StandardScaler.
-
-Comparação inicial do modelo com Regressão Logística, com avaliação de desempenho via validação cruzada.
-
-Esse resultado baixo da curva ROC demonstra principalmente que precisamos de mais variáveis, a qualidade dos dados e a escolha das variáveis têm um impacto enorme no desempenho do modelo. 
 
 ## Criação dos Modelos de ML
 
