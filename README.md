@@ -156,3 +156,89 @@ Implementação de um pipeline para padronização dos dados usando StandardScal
 Comparação inicial de modelos com Regressão Logística e XGBoost, com avaliação de desempenho via validação cruzada.
 
 Esse resultado baixo da curva ROC demonstra principalmente que precisamos de mais variáveis, a qualidade dos dados e a escolha das variáveis têm um impacto enorme no desempenho do modelo. 
+
+## Criação dos Modelos de ML
+
+Foram avaliados diferentes modelos de classificação no conjunto de dados previamente preparados. Utilizando a métrica **ROC AUC** para comparar o desempenho dos modelos e empregando validação cruzada estratificada para garantir resultados mais confiáveis.
+
+## Modelos Utilizados
+Os seguintes modelos de classificação são avaliados:
+- **Logistic Regression**
+- **Random Forest**
+- **XGBoost**
+- **LGBM**
+- **CatBoost**
+
+## Metodologia
+1. Cada modelo é instanciado e treinado com os dados de treino (`X_train_prepared`, `y_train`).
+2. O tempo de treinamento de cada modelo é registrado.
+3. As previsões são feitas tanto no conjunto de treino (`X_train_prepared`) quanto no conjunto de teste (`X_test`).
+4. O desempenho é avaliado utilizando a métrica **ROC AUC**:
+   - **Score no conjunto de treino**
+   - **Média da validação cruzada** (`cross_val_score` com 5 folds estratificados)
+   - **Desvio padrão da validação cruzada**
+5. Os resultados são armazenados em dicionários para análise posterior:
+   - `models_train_scores`: armazena o ROC AUC do treino.
+   - `models_val_scores`: armazena a média do ROC AUC na validação cruzada.
+6. Os resultados de cada modelo são impressos no console, incluindo o tempo de treinamento.
+
+
+![cartao_nubank](images/output-curvas-roc-modelos.png)
+
+
+## Resultados dos Modelos
+
+### 1. **Logistic Regression**
+- **Training score:** 0.5686
+- **Average validation score:** 0.5945
+- **Standard deviation:** 0.0059
+- **Training time:** 0.0310 segundos
+
+### 2. **Random Forest**
+- **Training score:** 0.9999
+- **Average validation score:** 0.5678
+- **Standard deviation:** 0.0102
+- **Training time:** 5.9086 segundos
+
+### 3. **XGBoost**
+- **Training score:** 0.8098
+- **Average validation score:** 0.5602
+- **Standard deviation:** 0.0073
+- **Training time:** 0.2992 segundos
+
+### 4. **LGBM**
+- **Training score:** 0.7105
+- **Average validation score:** 0.5864
+- **Standard deviation:** 0.0041
+- **Training time:** 0.14418 segundos
+
+### 5. **CatBoost**
+- **Training score:** 0.7579
+- **Average validation score:** 0.5786
+- **Standard deviation:** 0.0061
+- **Training time:** 9.6981 segundos
+
+## Análise dos Resultados
+
+### Observações Gerais
+- **Logistic Regression** apresentou o melhor desempenho de validação, com uma boa média de **(0.5945)**. O modelo teve uma boa relação entre os scores de treinamento e validação, sem sinais de overfitting.
+  
+- **Random Forest** teve um **overfitting severo**, com um score de treino quase perfeito **(0.9999)** e um desempenho significativamente inferior na validação **(0.5678)**. Isso sugere que o modelo está memorizando os dados de treino e não generalizando bem para dados não vistos.
+  
+- **XGBoost** teve um bom desempenho de treino **(0.8098)**, mas a validação é ligeiramente pior **(0.5602)**. Esse modelo teve um tempo de treinamento bem mais rápido que o Random Forest e o CatBoost.
+
+- **LGBM** teve um desempenho razoável de **(0.7105)**, e um score de validação de **(0.5864)**. Seu tempo de treinamento foi significativamente pequeno, **(0.14)**, assim como foi com XGBoost.
+
+- **CatBoost** teve também um desempenho razoável de **(0.7579)**, com um score de validação de **(0.5786)**. Embora tenha um bom desempenho comparado aos outros, o tempo de treinamento é significativamente mais alto **(9.6981 segundos)**.
+
+## Melhorias para Aumentar o Desempenho
+
+***Como não tivemos resultados significantes para a curva ROC entre os modelos, acreditamos que o ideal ainda seja obter mais variáveis significativas para a base dos dados, mas vamos por enquanto trabalhar no aprimoramento desses modelos.***
+
+- **Logistic Regression** teve o melhor desempenho de validação, mas pode ser ajustado para melhorar a curva ROC.
+- **Random Forest** sofreu com overfitting, necessitando ajustes de hiperparâmetros.
+- **XGBoost**, **LGBM** e **CatBoost** podem ser melhorados com ajuste fino de hiperparâmetros e balanceamento de dados.
+  
+Combinar modelos com **ensemble learning** pode melhorar a performance geral.
+
+
