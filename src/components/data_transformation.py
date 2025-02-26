@@ -2,7 +2,9 @@ import sys
 import os
 import numpy as np
 import pandas as pd
+from scipy.stats.mstats import winsorize
 from dataclasses import dataclass
+from sklearn.decomposition import PCA
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -44,7 +46,8 @@ class DataTransformation:
             numerical_pipeline = Pipeline(
                 steps=[
                     ("imputer", SimpleImputer(strategy="median")),
-                    ("scaler", StandardScaler())
+                    ("scaler", StandardScaler()),
+                    ("PCA", PCA())
                 ]
             )
 
@@ -96,6 +99,22 @@ class DataTransformation:
         df.loc[(df[column] >= 301) & (df[column] <= 700), "score"] = "medio"
         df.loc[df[column] >= 701, "score"] = "alto"
         return df
+        
+    def apply_winsorize(self, X, limits=(0.05, 0.05)):
+        """
+        Aplica winsorização aos dados numéricos de um DataFrame.
+        
+        Parâmetros:
+        - X: DataFrame do pandas contendo os dados.
+        - limits: Tupla com os limites inferior e superior para winsorização.
+
+        Retorna:
+        - DataFrame com os valores numéricos winsorizados.
+        """
+        return X.apply(lambda x: winsorize(x, limits=limits)\
+                       if x.dtype in [np.float64, np.int64] else x)
+    
+
 
     def prepare_data(self, train, test, target_feature="target_default"):
         """Prepara os dados de treino e teste, separando features e target."""
@@ -130,6 +149,9 @@ class DataTransformation:
 
             train = self.categorize_score(train)
             test = self.categorize_score(test)
+
+            train = self.apply_winsorize(train)
+            test = self.apply_winsorize(test)
 
             X_train, y_train, X_test, y_test = self.prepare_data(train, test)
 
