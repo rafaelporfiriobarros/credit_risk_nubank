@@ -135,3 +135,4 @@ notebooks/data/train_2.csv
 logs/
 src/
 setup.py
+artifacts/
