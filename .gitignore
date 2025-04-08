@@ -132,6 +132,6 @@ dmypy.json
 notebooks/data/train.csv
 notebooks/data/train_2.csv
 
-logs
-src
+logs/
+src/
 setup.py
