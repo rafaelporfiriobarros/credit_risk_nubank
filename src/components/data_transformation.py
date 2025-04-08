@@ -99,6 +99,7 @@ class DataTransformation:
         df.loc[(df[column] >= 301) & (df[column] <= 700), "score"] = "medio"
         df.loc[df[column] >= 701, "score"] = "alto"
         return df
+
         
     def apply_winsorize(self, X, limits=(0.05, 0.05)):
         """

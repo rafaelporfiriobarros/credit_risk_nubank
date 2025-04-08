@@ -1,11 +1,3 @@
-'''
-This script aims to provide functions that will turn the modelling process easier
-'''
-
-'''
-Importing libraries
-'''
-
 import os
 import sys
 
