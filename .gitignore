@@ -136,3 +136,6 @@ logs/
 src/
 setup.py
 artifacts/
+
+notebooks/modelling.ipynb
+notebooks/modelling_old.ipynb
