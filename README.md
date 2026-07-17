@@ -1,579 +1,394 @@
-# 📊 Modelo de Machine Learning para Previsão de Inadimplência
-
-## 📌 Objetivo
-
-Desenvolver um modelo de Machine Learning capaz de prever a probabilidade de inadimplência de clientes utilizando informações cadastrais, financeiras e comportamentais.
-
-O projeto contempla:
-
-- Tratamento e limpeza dos dados;
-- Engenharia de atributos;
-- Construção de pipelines automatizados;
-- Treinamento de múltiplos algoritmos;
-- Avaliação utilizando métricas de risco de crédito;
-- Interpretação dos resultados;
-- Geração de score de crédito.
-
----
-
-# 🏗️ Arquitetura do Projeto
-
-```text
-Dados Brutos
-      │
-      ▼
-Limpeza dos Dados
-      │
-      ▼
-Feature Engineering
-      │
-      ▼
-Train/Test Split
-      │
-      ▼
-Pipeline de Pré-Processamento
-      │
-      ▼
-Treinamento dos Modelos
-      │
-      ▼
-Avaliação (AUC, ROC, KS)
-      │
-      ▼
-Seleção do Melhor Modelo
-      │
-      ▼
-Feature Importance
-      │
-      ▼
-Score de Crédito
-```
-
----
+# Risco de Crédito Nubank 
 
-# 📂 Bibliotecas Utilizadas
+<p align="center">
+  <img src="./images/cartao-nubank.jpg" alt="nubank" width="800">
+</p>
 
-```python
-pandas
-numpy
-matplotlib
-scikit-learn
-xgboost
-lightgbm
-catboost
-```
+# 1. Sobre o projeto
 
-Principais módulos utilizados:
+- Este projeto tem como objetivo desenvolver um modelo de Machine Learning para previsão de inadimplência **(Credit Default Prediction)**, simulando um cenário real de análise de risco de crédito em uma instituição financeira.
 
-- Pipeline
-- ColumnTransformer
-- StandardScaler
-- OneHotEncoder
-- SimpleImputer
-- Train Test Split
-- ROC Curve
-- ROC AUC Score
+- O trabalho segue a metodologia **CRISP-DM**, passando pelas etapas de entendimento do problema, exploração dos dados, preparação, modelagem, avaliação e interpretação dos resultados. Todo o processo foi desenvolvido em Python, utilizando boas práticas de ciência de dados e construção de pipelines reprodutíveis.
 
----
+- O conjunto de dados contém aproximadamente **45.000** registros e **43** variáveis, representando informações financeiras, cadastrais e comportamentais dos clientes, como score de crédito, limite disponível, renda, histórico de empréstimos, consultas realizadas por provedores externos, entre outras.
 
-# 📥 Carregamento dos Dados
+# Problema de negócio e objetivo do projeto
 
-Os dados são carregados a partir do arquivo:
+- O principal objetivo é prever a variável **target_default**, identificando clientes com maior probabilidade de inadimplência antes da concessão de crédito, auxiliando na tomada de decisão e reduzindo perdas financeiras.
 
-```python
-acquisition_train.csv
-```
+# Etapas do projeto
 
-```python
-df = pd.read_csv("./data/acquisition_train.csv")
-```
+## 1. Análise Exploratória dos Dados (EDA)
 
-Após a leitura é realizada uma inspeção inicial:
+Durante a análise exploratória foram realizadas diversas etapas para compreender a qualidade dos dados e identificar padrões relevantes:
 
-```python
-df.info()
-```
+- Análise de valores ausentes (Missing Values);
+- Tratamento de registros inconsistentes;
+- Correção de valores inválidos (como limites de crédito iguais a zero e rendas infinitas);
+- Identificação e tratamento de outliers;
+- Análise univariada e bivariada;
+- Estatísticas descritivas;
+- Matriz de Correlação de Pearson;
+- Análise de Multicolinearidade utilizando VIF;
+- Construção de perguntas de negócio para geração de insights.
 
-Objetivos da análise inicial:
+Além das análises estatísticas, foram investigadas relações entre variáveis como **Score de Crédito**, **Risk Rate**, **Renda**, **Limite de Crédito**, **Histórico de Empréstimos** e consultas realizadas por provedores externos.
 
-- Verificar tipos de dados;
-- Identificar valores ausentes;
-- Detectar possíveis inconsistências.
+## 2. Feature Engineering
 
----
+Foram criadas novas variáveis com o objetivo de melhorar a capacidade preditiva dos modelos, incluindo:
 
-# 🧹 Limpeza dos Dados
+- Transformação da variável alvo para formato binário;
+- Tratamento de variáveis categóricas;
+- Imputação de valores ausentes;
+- Padronização das variáveis numéricas;
+- Criação de categorias de Score de Crédito;
+- Preparação completa dos dados utilizando Pipelines do Scikit-Learn.
 
-## Tratamento da Variável Target
+## 3. Modelagem
 
-A variável alvo do problema é:
+Foram treinados e comparados diferentes algoritmos de Machine Learning:
 
-```python
-target_default
-```
+- Regressão Logística
+- Random Forest
+- Gradient Boosting
+- XGBoost
 
-Conversão para formato numérico:
+Todos os modelos foram treinados utilizando um pipeline único de pré-processamento, garantindo que as transformações fossem aplicadas corretamente tanto nos dados de treino quanto de teste.
 
-```python
-pd.to_numeric()
-```
+## 4. Avaliação
 
-Remoção de registros sem informação da variável alvo:
+Os modelos foram comparados utilizando métricas amplamente empregadas em problemas de risco de crédito:
 
-```python
-dropna(subset=[target])
-```
+- Curva ROC
+- Estatística KS (Kolmogorov-Smirnov)
+- Comparação entre modelos
 
----
+Após a avaliação, foi selecionado o modelo com melhor desempenho para análise detalhada.
 
-## Remoção de Variáveis
+## 5. Interpretabilidade
 
-Foram removidas colunas consideradas:
+- Para aumentar a transparência das previsões foi utilizada a técnica de interpretabilidade **Feature Importance**.
 
-- Identificadores únicos;
-- Dados pessoais;
-- Informações redundantes;
-- Variáveis com baixa utilidade preditiva.
+- Essa análise permitiu compreender quais variáveis exerceram maior influência nas decisões do modelo.
 
-Exemplos:
+# Análise Exploratória dos Dados 
 
-```python
-ids
-zip
-email
-user_agent
-profile_phone_number
-lat_lon
-shipping_zip_code
-```
+## Análise Inicial dos Dados
 
-Essa etapa reduz ruído e minimiza risco de overfitting.
+- O dataset possui **43** variáveis e **45.000** registros.
+- Dessas **43** variáveis, **8** possuem mais de **10%** de valores missing, **target_fraud** é a variável com a maior porcentagem de valores ausentes **(96.6%)**, em segundo e terceiro lugar temos as variáveis **last_amount_borrowed** e **last_borrowed_in_months** com **(66.5%)** de valores ausentes.
+- A variável **target_fraud** mostra se existe ou não fraude de cartão de crédito. Nesse caso essa variável não é importante para o projeto.Portanto, esta coluna será excluída.
+- As variáveis **last_amount_borrowed**, **last_borrowed_in_months**, **ok_since** e **external_data_provider_credit_checks_last_2_year** possuem mais de 50% de valores ausentes, substituir esses valores é algo difícil, manter elas pode gerar erros durante a predição. Portanto, estas colunas serão excluídas.
+- As variáveis **job_name**, **external_data_provider_first_name**, **profile_phone_number** e **zip** são variáveis insignificantes para o projeto, portanto serão excluídas.
+- A variável **external_data_provider_email_seen_before** possui um valor mínimo de -999.000000, certamente foi um erro, nesse caso, vamos alterar para o tipo NaN.
+- A variável **reported_income** possui um valor máximo descrito como inf(infinito), nesse caso, vamos alterar para o tipo NaN.
+- A variável **credit_limit** possui um valor mínimo de 0.000000, isso não existe em instituições financeiras, é obrigatório liberar um valor X de crédito para o cliente. Portanto, este valor será substituído por NaN.
+- As variáveis:
+    - **ids**, **score_1**, **score_2**, **reason**, **facebook_profile**, **state**, **zip**, **channel**, **job_name**, **real_state**,
+**email**, **external_data_provider_first_name**, **lat_lon**, **marketing_channel**, **external_data_provider_email_seen_before**,
+**application_time_in_funnel**, **application_time_applied**, **external_data_provider_fraud_score**, **profile_phone_number**, **shipping_zip_code**, **profile_tags**, **user_agent**, e **target_fraud** são variáveis com valores não significantes para o projeto, portanto serão excluídas.
 
----
+## Relatório Análise Univariada
 
-# ⚙️ Engenharia de Atributos
+- Entre os **Scores**, o Score 3 é o mais diversificado para uma análise bi e multivariada, onde o score **340.0** é o valor mais frequente.
 
-## Debt-to-Income Ratio
+- Em **Risk Rate** o valor de **0.29** é o valor mais frequente, onde o valor máximo registrado é de **0.57**.
 
-Relação entre dívida e renda.
+- Em **Last Amount Borrowed** o valor de **12,024.02** é o mais frequente, e praticamente isolado, pois em segundo lugar vem o valor de 10022.75 com apenas 3 registros.
 
-```python
-debt_to_income =
-last_amount_borrowed / income
-```
+- Em **Last Borrowed in Months** **36,0** meses é o intervalo com mais frequência.
 
-### Interpretação
+- Em **Credit Limit** o valor de **29,942.00** é o valor mais frequente, e praticamente isolado, pois em segundo lugar vem o valor de **10,000.0** com apenas **107** registros.
 
-Quanto maior o indicador:
+- Em **Income** o valor de **60,022.37** é o mais frequente, e praticamente isolado, pois em segundo lugar vem o valor de **75,017.74** com apenas 5 registros.
 
-- Maior comprometimento financeiro;
-- Maior risco de inadimplência.
+- Em **Ok Since** temos o valor de **32,0** com mais frequência e praticamente isolado, com **20,084** registros.
 
----
+- Em **N Bankruptcies** podemos ver que os clientes não tiveram declaração de falência.
 
-## Credit Utilization
+- Em **N Defaulted Loans** podemos ver que número de empréstimos não possuem inadimplência.
 
-Percentual do limite de crédito utilizado.
+- Em **N Accounts** podemos ver que grande parte dos clientes possuem mais de **5** a **10** contas ou créditos em seus nomes.
 
-```python
-credit_utilization =
-last_amount_borrowed / credit_limit
-```
+- Em **N Issues** podemos ver que **10** problemas ou ocorrências, irregularidades associadas as contas dos clientes são mais frequentes, seguidas de 9, 8 e 11 ocorrências.
 
-### Interpretação
+- Em **External Data Provider Credit Checks Last 2 Years** possuem **0** quantidade de consultas.
 
-Clientes próximos do limite disponível tendem a apresentar maior risco.
+- **External Data Provider Credit Checks Last Month** já é um pouco diferente. **2** é o números mais frequente de vezes que provedores externos consultaram o histórico de crédito no mês anterior.
 
----
+- Em **External Data Provider Credit Checks Last Year** **1** que siginica True é o numero com mais frequência em consultas dos dados históricos de crédito.
 
-## Remoção de Variáveis Adicionais
+- Em **Reported Income** o valor de 100,720.00 é o mais frequente. Em segundo lugar vem o valor de 26,601.00.
 
-Após a criação dos novos atributos foram removidas algumas variáveis:
+- Em **Shipping State** é basicamente o registro dos estados onde se localizam cada cliente. **SP** é o estado com mais frequência.
 
-```python
-income
-score_3
-score_4
-score_5
-score_6
-```
+- E em **Target Default** podemos ver que há mais registros **positivos** com relação aos créditos.
 
-Objetivo:
+## Relatório Análise Bivariada 
 
-- Evitar multicolinearidade;
-- Reduzir dimensionalidade.
+Sobre as correlações feitas com **Diagramas de Dispersão**, **Correlação de Pearson**, e verificação de **Multicolinearidade** utilizando **VIF(Variance Inflation Factor)**:
 
----
+- Não foi detectado correlações significativas entre as variáveis utilizando a técnica Correlação de Pearson. 
 
-# 🔀 Divisão dos Dados
+- As Correlações de Pearson ficaram abaixo de **0.50**, apenas duas variáveis tiveram um valor de **0.84**. 
 
-Separação entre variáveis explicativas e variável alvo.
+- No teste do VIF, os valores de quase todas as variáveis ficaram abaixo de **5.0**, que é o aceitável para a inexistência de multicolinearidade, e correlação, apenas a variável last_borrowed_in_months ficou com valor de 1,222.99, provavelmente é um erro.
 
-```python
-X = df2.drop(columns=[target])
-y = df2[target]
-```
 
----
+**Perguntas de Negócio**
 
-## Train Test Split
+Foram criadas perguntas de negócio iniciais para os ****Médios - Score 3 de 301 até 700****, que significa um médio risco de inadimplência. 
 
-```python
-train_test_split(
-    test_size=0.30,
-    stratify=y,
-    random_state=42
-)
-```
+Com isso detectamos as seguintes informações:
 
-### Configuração
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem **Risk Rate maior do que 0.50**, significando um certo risco de inadimplência.
 
-| Conjunto | Percentual |
-|-----------|-----------|
-| Treino | 70% |
-| Teste | 30% |
+- Há clientes com **Médios - Score 3 de 301 até 700** que fizeram últimos empréstimos maiores que **20.000**.
 
-O parâmetro `stratify=y` preserva a proporção de inadimplentes e adimplentes.
+- Há clientes com **Médios - Score 3 de 301 até 700** com limite de crédito maior que **50.000**.
 
----
+- Há clientes com **Médios - Score 3 de 301 até 700** com Renda entre **10.000 a 30.000**.
 
-# 🔧 Pipeline de Pré-Processamento
+- Há clientes com **Médios - Score 3 de 301 até 700** com **OK Since** entre **5 meses a 10 meses**. Isso significa que há possível inadimplência.
 
-## Variáveis Numéricas
+- Há clientes com **Médios - Score 3 de 301 até 700** com 0 registros de falência.
 
-```python
-SimpleImputer(strategy='median')
-StandardScaler()
-```
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem mais de **1 conta**.
 
-### Etapas
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem problemas (n_issues) maiores do que **1**.
 
-1. Preenchimento de valores faltantes pela mediana;
-2. Padronização dos dados.
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem o "número de vezes que um provedor de dados externo realizou uma verificação de crédito sobre uma pessoa no último mês."**(external_data_provider_credit_checks_last_month)** maiores do que **1**. Isso significa que houve checagem na verificação de crédito.
 
----
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem "número de vezes que um provedor de dados externo realizou uma verificação de crédito sobre uma pessoa no último ano."(**external_data_provider_credit_checks_last_year**) igual a 1. Isso também significa que houve checagem na verificação de crédito.
 
-## Variáveis Categóricas
+- Há clientes com **Médios - Score 3 de 301 até 700** que possuem Renda Reportada maior que **100.000**.
 
-```python
-SimpleImputer(strategy='most_frequent')
-OneHotEncoder()
-```
+- Há clientes com **Médios - Score 3 de 301 até 700** que estão em outros estados além de **SP**.
 
-### Etapas
+- Há clientes com **Médios - Score 3 de 301 até 700** que posseum inadimplência **(target_default = 1)**.
 
-1. Preenchimento pela categoria mais frequente;
-2. Transformação para representação numérica.
+# Modelagem
 
----
+## Objetivo
 
-## Column Transformer
+O notebook **modelling_novo.ipynb** reúne todo o processo de construção, treinamento e avaliação de modelos de Machine Learning para previsão de inadimplência **(Credit Default Prediction)**. O objetivo é identificar clientes com maior probabilidade de entrar em **default**, auxiliando a tomada de decisão na concessão de crédito.
 
-Combina os dois pipelines:
+## Fluxo do projeto
 
-```python
-ColumnTransformer()
-```
+### 1. Importação das bibliotecas
 
-Permitindo que cada tipo de variável receba o tratamento adequado.
+Inicialmente foram importadas as principais bibliotecas utilizadas no projeto, incluindo:
 
----
+- Pandas e NumPy para manipulação dos dados;
+- Matplotlib para visualizações;
+- Scikit-Learn para pré-processamento, construção de pipelines, treinamento e avaliação dos modelos;
 
-# 🤖 Modelos Treinados
+### 2. Carregamento dos dados
 
-Foram avaliados diversos algoritmos de classificação.
+O conjunto de dados é carregado a partir do arquivo **acquisition_train.csv**, contendo informações cadastrais, financeiras e comportamentais dos clientes.
 
-## Logistic Regression
+Também é realizada uma inspeção inicial da base para verificar:
 
-```python
-LogisticRegression(
-    max_iter=1000,
-    class_weight='balanced'
-)
-```
+- tipos das variáveis;
+- quantidade de registros;
+- presença de valores ausentes.
 
-### Vantagens
+### 3. Limpeza dos dados
 
-- Simples;
-- Interpretável;
-- Muito utilizada em scorecards.
+Nesta etapa são removidas variáveis que não agregam valor ao modelo, incluindo:
 
----
+- identificadores;
+- informações de localização;
+- dados pessoais;
+- variáveis relacionadas à fraude;
+- colunas com baixa utilidade preditiva.
 
-## Random Forest
+Também são tratados registros inconsistentes, como valores extremamente elevados de renda informada **(reported_income)**.
 
-```python
-RandomForestClassifier(
-    n_estimators=200,
-    max_depth=8
-)
-```
+### 4. Feature Engineering
 
-### Vantagens
+Para aumentar o poder preditivo dos modelos foram criadas novas variáveis derivadas, entre elas:
 
-- Captura relações não lineares;
-- Reduz overfitting por meio de múltiplas árvores.
+**Debt-to-Income**
 
----
+Relação entre o valor do último empréstimo e a renda do cliente.
 
-## Gradient Boosting
+Esta variável representa o comprometimento da renda com dívidas.
 
-```python
-GradientBoostingClassifier()
-```
+**Credit Utilization**
 
-### Vantagens
+Relação entre o último valor emprestado e o limite de crédito disponível.
 
-- Excelente capacidade preditiva;
-- Bastante utilizado em problemas tabulares.
+Essa métrica indica o nível de utilização do crédito concedido.
 
----
+**Total Negatives**
 
-## XGBoost
+Soma de indicadores negativos do histórico do cliente, como:
 
-Modelo baseado em Gradient Boosting otimizado.
+quantidade de falências;
+empréstimos inadimplentes;
+ocorrências negativas.
 
-### Benefícios
+**Income Log**
 
-- Alta performance;
-- Tratamento robusto de variáveis.
+Aplicação da transformação logarítmica na renda para reduzir assimetria da distribuição.
 
----
+**Score Mean**
 
-## LightGBM
+Média dos diferentes scores disponíveis na base, sintetizando informações provenientes de múltiplas fontes.
 
-Framework eficiente para grandes volumes de dados.
+Após a criação dessas variáveis, algumas colunas originais são removidas para evitar redundância e reduzir multicolinearidade.
 
-### Benefícios
+### 5. Separação dos dados
 
-- Treinamento rápido;
-- Baixo consumo de memória.
+Os dados são divididos em:
 
----
+- Variáveis explicativas **(X)**
+- Variável alvo **(target_default)**
 
-## CatBoost
+Em seguida é realizado o **Train/Test Split**, preservando um conjunto independente para avaliação do desempenho do modelo.
 
-Modelo especializado em tratamento de variáveis categóricas.
+### 6. Pipeline de pré-processamento
 
-### Benefícios
+Foi construída uma pipeline utilizando o Scikit-Learn, garantindo que todas as etapas de transformação sejam executadas de forma consistente.
 
-- Excelente desempenho em bases heterogêneas;
-- Menor necessidade de pré-processamento.
+**Variáveis numéricas**
 
----
+- Imputação pela mediana;
+- Padronização utilizando StandardScaler.
 
-# 📈 Avaliação dos Modelos
+**Variáveis categóricas**
 
-## ROC AUC
+- Imputação da categoria **Unknown**;
+- Codificação utilizando **One-Hot Encoding**.
 
-A principal métrica utilizada para comparação dos modelos foi:
+Todo o pré-processamento é integrado por meio de um **ColumnTransformer**, evitando vazamento de dados **(Data Leakage)**.
 
-```python
-roc_auc_score()
-```
+### 7. Modelos treinados
 
-### Interpretação
+Foram comparados quatro algoritmos de classificação:
 
-| AUC | Qualidade |
-|------|------|
-| 0.50 | Aleatório |
-| 0.60 - 0.70 | Razoável |
-| 0.70 - 0.80 | Bom |
-| 0.80 - 0.90 | Muito Bom |
-| > 0.90 | Excelente |
+- Logistic Regression
+- Random Forest
+- Gradient Boosting
+- XGBoost
 
----
+Para lidar com o desbalanceamento da variável alvo foram utilizadas estratégias específicas:
 
-# 📉 Curva ROC
+- class_weight='balanced' na Regressão Logística;
+- scale_pos_weight no XGBoost.
 
-A curva ROC foi construída para todos os modelos.
+### 8. Treinamento
 
-```python
-roc_curve()
-```
+Cada algoritmo é treinado dentro de uma Pipeline composta por:
 
-Objetivo:
+- Pré-processamento → Modelo
 
-Avaliar a capacidade de separação entre:
+Após o treinamento, é calculada a probabilidade de inadimplência para o conjunto de teste.
 
-- Bons clientes;
-- Maus clientes.
+### 9. Avaliação dos modelos
 
----
+O desempenho é comparado utilizando a métrica ROC-AUC e a Matriz de Confusão, amplamente utilizada em problemas de risco de crédito.
 
-# 📊 Estatística KS
+Também é construída a Curva ROC para comparação visual entre os modelos.
 
-Além do AUC, foi calculada a métrica KS.
+<p align="center">
+  <img src="./images/output.png" alt="Curva Roc" width="800">
+</p>
 
-```python
-KS = max(
-| CumGood - CumBad |
-)
-```
+Como métrica principal foi utilizada a curva ROC e a métrica AUC, bastante empregadas em problemas de classificação.
 
-## Interpretação
+- O modelo **Random Forest** apresentou o melhor desempenho, com **AUC** de aproximadamente **0,63**.
 
-| KS | Avaliação |
-|------|------|
-| <20 | Fraco |
-| 20-40 | Bom |
-| 40-60 | Muito Bom |
-| >60 | Excelente |
+- Apesar de a diferença entre os modelos ser relativamente pequena, o Random Forest conseguiu apresentar maior capacidade de separação entre clientes adimplentes e inadimplentes.
 
-A métrica KS é amplamente utilizada em:
+- Vale destacar que esses resultados representam um desempenho moderado, algo esperado considerando as limitações da base de dados disponível.
 
-- Bancos;
-- Fintechs;
-- Instituições financeiras.
+- Ao analisar a **matriz de confusão**, observamos que o modelo apresentou bom desempenho na identificação de clientes adimplentes.
 
----
+- O modelo apresentou bom desempenho na identificação de clientes adimplentes, com alta taxa de acerto para a **classe majoritária**.
 
-# 🏆 Seleção do Melhor Modelo
+- Foram identificados **407** **inadimplentes** corretamente, porém ainda houve quantidade relevante de falsos negativos.
 
-Os modelos foram classificados de acordo com o AUC.
+- Os resultados evidenciam a necessidade de melhorias no **recall** da classe **inadimplente**.
 
-```python
-best_model =
-sorted(results,
-       key=lambda x:x[1],
-       reverse=True)[0]
-```
+- **Acurácia** geral de **79%**, influenciada pelo **desbalanceamento** da base.
 
-O modelo com maior capacidade discriminatória foi selecionado para produção.
+- A classe adimplente apresentou desempenho elevado **(Precision: 0,86 | Recall: 0,90)**.
 
----
+- Para inadimplência, o modelo obteve **Precision** de **0,27** e **Recall** de **0,20**.
 
-# 🔍 Interpretabilidade
+- O modelo demonstrou maior eficiência na identificação de bons pagadores do que inadimplentes.
 
-## Feature Importance
+- Os resultados demonstram que existe potencial para evolução com novas técnicas de balanceamento e enriquecimento dos dados.
 
-Para modelos baseados em árvores foi calculada a importância das variáveis.
+<p align="center">
+  <img src="./images/matriz.png" alt="Matriz de Confusao" width="800">
+</p>
 
-```python
-feature_importances_
-```
+### 10. Estatística KS
 
-Objetivos:
+Além da ROC-AUC, o notebook calcula a Estatística Kolmogorov-Smirnov (KS), bastante utilizada pelo mercado financeiro para avaliar o poder discriminatório de modelos de crédito.
 
-- Identificar fatores de risco;
-- Explicar decisões do modelo;
-- Apoiar áreas de negócio.
+- Novamente o **Random Forest** apresentou o melhor resultado.
 
----
+- Embora o valor obtido ainda esteja abaixo do observado em modelos utilizados em produção nas instituições financeiras, ele confirma que o algoritmo conseguiu separar melhor clientes de maior e menor risco quando comparado aos demais modelos.
 
-## SHAP (Opcional)
 
-O projeto já possui estrutura preparada para implementação de SHAP.
+### 11. Seleção do melhor modelo
 
-Possibilidades:
+Após comparar os resultados, o modelo com maior desempenho é automaticamente selecionado para as etapas seguintes de interpretação.
 
-- Explicações globais;
-- Explicações individuais;
-- Transparência regulatória.
+### 12. Feature Importance
 
----
+Para modelos baseados em árvores é calculada a importância das variáveis (Feature Importance), permitindo identificar quais atributos tiveram maior influência nas previsões.
 
-# 🎯 Geração do Score de Crédito
+As variáveis que mais contribuíram para as decisões do modelo Random Forest foram:
 
-Após o treinamento:
+- risk_rate
+- income_log 
+- debt_to_income 
+- last_borrowed_in_months
+- score_mean
 
-```python
-y_pred =
-best_pipe.predict_proba(X_test)[:,1]
-```
+Esses resultados fazem sentido do ponto de vista de negócio, pois renda, nível de endividamento e histórico de crédito são fatores tradicionalmente utilizados na avaliação de risco.
 
-Probabilidade de inadimplência:
+Também foi interessante observar que variáveis criadas durante a Engenharia de Atributos apareceram entre as mais importantes, demonstrando que essa etapa agregou valor ao modelo.
 
-```python
-prob_default
-```
+### 13. Credit Score
 
-Score calculado:
+Ao final do processo, a probabilidade de inadimplência prevista pelo melhor modelo é convertida em um score simplificado:
 
-```python
-score = 1000 - (prob_default * 1000)
-```
+- maior probabilidade de default → menor score
+- menor probabilidade de default → maior score
 
----
+Esse score serve como uma representação intuitiva do risco de crédito de cada cliente.
 
-## Interpretação do Score
+### Tecnologias utilizadas
 
-| Score | Risco |
-|---------|---------|
-| 800 - 1000 | Muito Baixo |
-| 600 - 799 | Baixo |
-| 400 - 599 | Médio |
-| 200 - 399 | Alto |
-| 0 - 199 | Muito Alto |
+- Python
+- Pandas
+- NumPy
+- Scikit-Learn
+- XGBoost
+- Matplotlib
+- Jupyter Notebook
 
----
+### Competências demonstradas
 
-# 📋 Métricas Complementares
+- Limpeza de dados
+- Feature Engineering
+- Machine Learning para classificação
+- Construção de Pipelines
+- Tratamento de dados categóricos e numéricos
+- Balanceamento de classes
+- Avaliação de modelos (ROC-AUC e KS)
+- Feature Importance
+- Interpretabilidade de modelos
+- Credit Scoring
+- Boas práticas utilizando Scikit-Learn Pipelines
 
-Também foram calculadas:
 
-```python
-precision_score
-recall_score
-confusion_matrix
-classification_report
-```
 
-Essas métricas permitem avaliar:
 
-- Precisão;
-- Sensibilidade;
-- Falsos positivos;
-- Falsos negativos.
-
----
-
-# 🚀 Possíveis Melhorias Futuras
-
-## Modelagem
-
-- Hyperparameter Tuning (Optuna)
-- Cross Validation
-- Ensemble Learning
-- Stacking
-
-## Engenharia de Dados
-
-- Pipeline automatizada com Airflow
-- Versionamento com DVC
-- Monitoramento de Drift
-
-## MLOps
-
-- MLflow
-- Docker
-- FastAPI
-- Deploy em Cloud
-
-## Interpretabilidade
-
-- SHAP completo
-- LIME
-- Explainable AI (XAI)
-
----
-
-# 📌 Conclusão
-
-Este projeto implementa uma solução completa de Credit Scoring utilizando Machine Learning, passando por todas as etapas fundamentais:
-
-- Preparação dos dados;
-- Engenharia de atributos;
-- Treinamento de múltiplos algoritmos;
-- Avaliação por métricas de risco;
-- Seleção do melhor modelo;
-- Interpretação dos resultados;
-- Construção de score de crédito.
-
-O fluxo segue boas práticas utilizadas em áreas de:
-
-- Risco de Crédito;
-- Analytics;
-- Data Science;
-- Fintechs;
-- Bancos.
